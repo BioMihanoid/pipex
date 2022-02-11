@@ -17,7 +17,7 @@ void	exec(char *cmd, char **envp)
 	while (paths[i])
 	{
 		temp = ft_strjoin(paths[i], "/");
-		this_path = ft_strjoin(temp, cmd_parse[i]);
+		this_path = ft_strjoin(temp, cmd_parse[0]);
 		free(temp);
 		if (access(this_path, F_OK) == 0)
 		{
@@ -40,11 +40,9 @@ void	child_one_process(int *fd, char **argv, char **envp)
 		perror("Error (input file)");
 	if (dup2(fd[1], 1) == -1)
 		perror("Error");
+	close(fd[0]);
 	if (dup2(fd_in, 0) == -1)
 		perror("Error");
-	close(fd[0]);
-	close(fd_in);
-	close(fd[1]);
 	exec(argv[2], envp);
 }
 
@@ -52,23 +50,20 @@ void	child_two_process(int *fd, char **argv, char **envp)
 {
 	int	fd_out;
 
-	fd_out = open(argv[4], O_CREAT | O_WRONLY | O_TRUNC, 0777);
+	fd_out = open(argv[4], O_CREAT | O_WRONLY | O_TRUNC, 0644);
 	if (fd_out < 0)
 		perror("Error (output file)");
 	if (dup2(fd[0], 0) == -1)
 		perror("Error");
+	close(fd[1]);
 	if (dup2(fd_out, 1) == -1)
 		perror("Error");
-	close(fd[1]);
-	close(fd_out);
-	close(fd[0]);
 	exec(argv[3], envp);
 }
 
 void	pipex(char **argv, char **envp)
 {
 	int		fd[2];
-	int 	status;
 	pid_t	pid1;
 	pid_t	pid2;
 
@@ -86,8 +81,8 @@ void	pipex(char **argv, char **envp)
 		child_two_process(fd, argv, envp);
 	close(fd[0]);
 	close(fd[1]);
-	waitpid(pid1, &status, 0);
-	waitpid(pid2, &status, 0);
+	waitpid(pid1, NULL, 0);
+	waitpid(pid2, NULL, 0);
 }
 
 int main(int argc, char **argv, char **envp)

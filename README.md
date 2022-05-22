@@ -21,4 +21,4 @@ make
 ./pipex infile cmd1 cmd2 outfile
 ```
 
-P.S. infile and outfile - the file from which the reading is performed and in which the result is written, respectively. cmd1 and cmd2 - commands applied to the text in the infile.
+infile and outfile - the file from which the reading is performed and in which the result is written, respectively. cmd1 and cmd2 - commands applied to the text in the infile.
